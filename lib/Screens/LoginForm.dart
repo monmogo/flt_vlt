@@ -1,25 +1,75 @@
-import 'package:flt_vlt/genTextFormField.dart';
 import 'package:flutter/material.dart';
+import 'package:flt_vlt/Comm/comHelper.dart';
+import 'package:flt_vlt/Comm/genLoginSignupHeader.dart';
+import 'package:flt_vlt/Comm/genTextFormField.dart';
+import 'package:flt_vlt/DatabaseHandler/DbHelper.dart';
+import 'package:flt_vlt/Model/UserModel.dart';
+import 'package:flt_vlt/Screens/SignupForm.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'SignUpForm.dart';
+import 'HomeForm.dart';
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key}) : super(key: key);
-
   @override
   _LoginFormState createState() => _LoginFormState();
 }
 
 class _LoginFormState extends State<LoginForm> {
+  Future<SharedPreferences> _pref = SharedPreferences.getInstance();
+  final _formKey = new GlobalKey<FormState>();
+
   final _conUserId = TextEditingController();
   final _conPassword = TextEditingController();
+  var dbHelper;
+
+  @override
+  void initState() {
+    super.initState();
+    dbHelper = DbHelper();
+  }
+
+  login() async {
+    String uid = _conUserId.text;
+    String passwd = _conPassword.text;
+
+    if (uid.isEmpty) {
+      alertDialog(context, "Please Enter User ID");
+    } else if (passwd.isEmpty) {
+      alertDialog(context, "Please Enter Password");
+    } else {
+      await dbHelper.getLoginUser(uid, passwd).then((userData) {
+        if (userData != null) {
+          setSP(userData).whenComplete(() {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => HomeForm()),
+                (Route<dynamic> route) => false);
+          });
+        } else {
+          alertDialog(context, "Error: User Not Found");
+        }
+      }).catchError((error) {
+        print(error);
+        alertDialog(context, "Error: Login Fail");
+      });
+    }
+  }
+
+  Future setSP(UserModel user) async {
+    final SharedPreferences sp = await _pref;
+
+    sp.setString("user_id", user.user_id);
+    sp.setString("user_name", user.user_name);
+    sp.setString("email", user.email);
+    sp.setString("password", user.password);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Login with Signup'),
-      // ),
+      appBar: AppBar(
+        title: Text('Login with Signup'),
+      ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Container(
@@ -27,52 +77,27 @@ class _LoginFormState extends State<LoginForm> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 50.0),
-                Text(
-                  'Login',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 30.0),
-                ),
-                SizedBox(height: 50.0),
-                Image.asset(
-                  "assets/image/logo.png",
-                  height: 150.0,
-                  width: 150.0,
-                ),
-                SizedBox(height: 50.0),
-                Text(
-                  'Welcome',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black38,
-                      fontSize: 25.0),
-                ),
-                SizedBox(
-                  height: 10.0,
-                ),
+                genLoginSignupHeader('Login'),
                 getTextFormField(
-                  controller: _conUserId,
-                  iconData: Icons.person,
-                  hintName: "User ID",
-                ),
+                    controller: _conUserId,
+                    icon: Icons.person,
+                    hintName: 'User ID'),
                 SizedBox(height: 10.0),
                 getTextFormField(
                   controller: _conPassword,
-                  iconData: Icons.key,
-                  hintName: "Password",
-                  is0bsureText: true,
+                  icon: Icons.lock,
+                  hintName: 'Password',
+                  isObscureText: true,
                 ),
                 Container(
-                  margin: EdgeInsets.all(20.0),
+                  margin: EdgeInsets.all(30.0),
                   width: double.infinity,
                   child: FlatButton(
-                    onPressed: () {},
                     child: Text(
                       'Login',
                       style: TextStyle(color: Colors.white),
                     ),
+                    onPressed: login,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.blue,
@@ -83,18 +108,18 @@ class _LoginFormState extends State<LoginForm> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Does not have account?'),
+                      Text('Does not have account? '),
                       FlatButton(
+                        textColor: Colors.blue,
+                        child: Text('Signup'),
                         onPressed: () {
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => SignUpForm()));
+                              MaterialPageRoute(builder: (_) => SignupForm()));
                         },
-                        textColor: Colors.blue,
-                        child: Text('Sign Up'),
                       )
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
