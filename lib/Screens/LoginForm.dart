@@ -1,5 +1,4 @@
-
-
+import 'package:flt_vlt/genTextFormField.dart';
 import 'package:flutter/material.dart';
 
 import 'SignUpForm.dart';
@@ -12,12 +11,15 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+  final _conUserId = TextEditingController();
+  final _conPassword = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login with Signup'),
-      ),
+      // appBar: AppBar(
+      //   title: Text('Login with Signup'),
+      // ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Container(
@@ -41,68 +43,40 @@ class _LoginFormState extends State<LoginForm> {
                 ),
                 SizedBox(height: 50.0),
                 Text(
-                  'Sample Code',
+                  'Welcome',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black38,
                       fontSize: 25.0),
                 ),
-                Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    margin: EdgeInsets.only(top: 10.0),
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(30.0)),
-                            borderSide: BorderSide(color: Colors.transparent)),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                          borderSide: BorderSide(color: Colors.blue),
-                        ),
-                        prefixIcon: Icon(Icons.person),
-                        hintText: ("User ID"),
-                        fillColor: Colors.grey[200],
-                        filled: true,
-                      ),
-                    )),
+                SizedBox(
+                  height: 10.0,
+                ),
+                getTextFormField(
+                  controller: _conUserId,
+                  iconData: Icons.person,
+                  hintName: "User ID",
+                ),
                 SizedBox(height: 10.0),
-                Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    margin: EdgeInsets.only(top: 10.0),
-                    child: TextFormField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(30.0)),
-                            borderSide: BorderSide(color: Colors.transparent)),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                          borderSide: BorderSide(color: Colors.blue),
-                        ),
-                        prefixIcon: Icon(Icons.key),
-                        hintText: ("Password"),
-                        fillColor: Colors.grey[200],
-                        filled: true,
-                      ),
-                    )
+                getTextFormField(
+                  controller: _conPassword,
+                  iconData: Icons.key,
+                  hintName: "Password",
+                  is0bsureText: true,
                 ),
                 Container(
-                  margin: EdgeInsets.all(30.0),
+                  margin: EdgeInsets.all(20.0),
                   width: double.infinity,
                   child: FlatButton(
-                    onPressed: () {  },
+                    onPressed: () {},
                     child: Text(
                       'Login',
                       style: TextStyle(color: Colors.white),
-
-
                     ),
                   ),
                   decoration: BoxDecoration(
                     color: Colors.blue,
-                    borderRadius: BorderRadius.circular(30.0), 
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
                 ),
                 Container(
@@ -110,9 +84,14 @@ class _LoginFormState extends State<LoginForm> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('Does not have account?'),
-                      FlatButton(onPressed: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (_)=> SignUpForm()));
-                      }, textColor: Colors.blue, child: Text('Sign Up'),)
+                      FlatButton(
+                        onPressed: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (_) => SignUpForm()));
+                        },
+                        textColor: Colors.blue,
+                        child: Text('Sign Up'),
+                      )
                     ],
                   ),
                 )
